@@ -1,33 +1,49 @@
 import {
-  Text, View, TextInput, TouchableOpacity, ScrollView, FlatList
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  FlatList,
+  Alert
 } from 'react-native';
 import { styles } from './styles';
+import { useEffect, useState } from 'react';
 
 import { Participant } from '../../components/Participant';
 
 export function Home() {
-  const participants = [
-    'Guilherme',
-    'João',
-    'Maria',
-    'Pedro',
-    'Ana',
-    'Mário',
-    'José',
-    'Carlos',
-    'Fernanda',
-    'Mariana',
-    'Rafael',
-    'Ricardo',
-  ];
+  const [participants, setParticipants] = useState<string[]>([]);
+  const [newParticipant, setNewParticipant] = useState('');
 
-  function handleAddParticipant() {
-    console.log('Adicionou participante');
+  function handleAddParticipant(name: string) {
+    if (participants.includes(name)) {
+      return Alert.alert('Participante já adicionado', 'Esse participante já foi adicionado ao evento');
+    }
+
+    setParticipants([...participants, name]);
   }
 
   function handleRemoveParticipant(name: string) {
+    Alert.alert('Remover participante', `Deseja remover o participante ${name}?`, [
+      {
+        text: 'Sim',
+        onPress: () => {
+          setParticipants(participants.filter((participant) => participant !== name));
+          Alert.alert('Removido', `O participante ${name} foi removido com sucesso!`)
+        }
+      },
+      {
+        text: 'Não',
+        style: 'cancel'
+      },
+    ]);
     console.log(`Removeu o ${name}`);
   }
+
+  useEffect(() => {
+    console.log(participants);
+  }, [participants]);
 
   return (
     <View style={styles.container}>
@@ -40,11 +56,13 @@ export function Home() {
           style={styles.input}
           placeholder="Novo do participante"
           placeholderTextColor="#6B6B6B"
+          onChangeText={setNewParticipant}
+          value={newParticipant}
         />
 
         <TouchableOpacity
           style={styles.addButton}
-          onPress={handleAddParticipant}
+          onPress={() => handleAddParticipant(newParticipant)}
         >
           <Text style={styles.addButtonText}>+</Text>
         </TouchableOpacity>
